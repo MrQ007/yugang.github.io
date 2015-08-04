@@ -42,6 +42,22 @@
                 </td>
               </tr>
               <tr>
+                <td>Branch</td>
+                <td>
+                  <xsl:choose>
+                    <xsl:when test="test_definition/environment/@branch">
+                      <xsl:if test="test_definition/environment/@branch = ''">
+                        N/A
+                      </xsl:if>
+                      <xsl:value-of select="test_definition/environment/@branch"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      N/A
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </td>
+              </tr>
+              <tr>
                 <td>ARCH</td>
                 <td>
                   <xsl:choose>
@@ -120,7 +136,7 @@
             </div>
             <table>
               <tr>
-                <th>Suite</th>
+                <th>Component</th>
                 <th>Passed</th>
                 <th>Failed</th>
                 <th>Blocked</th>
@@ -156,63 +172,6 @@
                 </tr>
               </xsl:for-each>
             </table>
-          </div>
-          <div id="fail_cases">
-            <div id="title">
-              <table>
-                <tr>
-                  <td class="title">
-                    <h1 align="center">
-                      Test Failures (
-                        <xsl:value-of select="count(test_definition/component/testcase[@result = 'FAIL'])"/>
-                      )
-                    </h1>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <xsl:for-each select="test_definition/component">
-              <xsl:sort select="@name"/>
-              <div id="btc">
-                <a href="#contents">Back to Contents</a>
-              </div>
-              <div id="component_title">
-                Test Component:
-                <xsl:value-of select="@name"/>
-                <a><xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute></a>
-              </div>
-              <table>
-                <tr>
-                  <th>Case_ID</th>
-                  <th>Purpose</th>
-                  <th>Result</th>
-                  <th>Comments</th>
-                </tr>
-                  <xsl:for-each select=".//testcase">
-                    <xsl:sort select="@id"/>
-                    <xsl:choose>
-                      <xsl:when test="@result">
-                        <xsl:if test="@result = 'FAIL'">
-                          <tr>
-                            <td>
-                              <xsl:value-of select="@id"/>
-                            </td>
-                            <td>
-                              <xsl:value-of select="@purpose"/>
-                            </td>
-                            <td class="red_rate">
-                              <xsl:value-of select="@result"/>
-                            </td>
-                            <td>
-                               <xsl:value-of select="@comments"/>
-                            </td>
-                          </tr>
-                        </xsl:if>
-                      </xsl:when>
-                    </xsl:choose>
-                  </xsl:for-each>
-              </table>
-            </xsl:for-each>
           </div>
           <div id="cases">
             <div id="title">
@@ -279,7 +238,7 @@
                         </xsl:otherwise>
                       </xsl:choose>
                       <td>
-                          <xsl:value-of select="@comments"/>
+                          <xsl:value-of select="."/>
                       </td>
                     </tr>
                   </xsl:for-each>
