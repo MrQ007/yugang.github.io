@@ -222,12 +222,12 @@
                             </td>
                           </xsl:if>
                           <xsl:if test="@result = 'BLOCK' ">
-                            <td>
+                            <td class="yellow_rate">
                               BLOCK
                             </td>
                           </xsl:if>
                           <xsl:if test="@result != 'BLOCK' and @result != 'FAIL' and @result != 'PASS' ">
-                            <td>
+                            <td class="yellow_rate">
                               Not Run
                             </td>
                           </xsl:if>

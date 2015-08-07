@@ -82,19 +82,15 @@
 }
 
 #testcasepage td.yellow_rate {
-  background-color: #ffcc00;
+  background-color: #ffc000;
 }
 
 #testcasepage td.green_rate {
-  background-color: #33cc33;
-}
-
-#testcasepage td.dgreen_rate {
-  background-color: #339933;
+  background-color: #93CE7C;
 }
 
 #testcasepage td.red_rate {
-  background-color: #FF3333;
+  background-color: #f37183;
 }
 
 #title table,
