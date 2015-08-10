@@ -4,6 +4,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "2",
                 "hardware": "Google Nexus 4",
                 "pass": "14",
@@ -24,6 +25,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "10",
@@ -39,6 +41,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "11",
@@ -54,6 +57,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "9",
@@ -69,6 +73,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "4",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "16",
@@ -89,6 +94,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "3",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "26",
@@ -109,6 +115,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "1",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "13",
@@ -117,6 +124,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "1",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "3",
@@ -137,6 +145,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "4",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "12",
@@ -145,6 +154,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "3",
                 "hardware": "Google Nexus 4",
                 "pass": "12",
@@ -165,6 +175,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "1",
@@ -173,6 +184,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "1",
@@ -188,6 +200,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "5",
@@ -203,6 +216,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "2",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "9",
@@ -211,6 +225,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "1",
                 "hardware": "Google Nexus 4",
                 "pass": "10",
@@ -235,6 +250,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "1",
                 "hardware": "Google Nexus 4",
                 "pass": "3",
@@ -255,6 +271,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "1",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "3",
@@ -275,6 +292,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "3",
@@ -283,6 +301,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "3",
@@ -298,6 +317,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "4",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "90",
@@ -318,6 +338,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "2",
@@ -333,6 +354,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "1",
@@ -348,6 +370,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "1",
@@ -363,6 +386,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "1",
@@ -371,6 +395,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "0",
                 "hardware": "Google Nexus 4",
                 "pass": "1",
@@ -386,6 +411,7 @@
             "embedded_crosswalk": {
                 "arch_path": "x86",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "1",
                 "hardware": "ASUS MeMO Pad 8 K011",
                 "pass": "20",
@@ -394,6 +420,7 @@
             "embedded_crosswalk_webview_plugin_for_cordova4.0": {
                 "arch_path": "arm",
                 "block": "0",
+                "build_path": "13.42.319.12",
                 "fail": "2",
                 "hardware": "Google Nexus 4",
                 "pass": "14",

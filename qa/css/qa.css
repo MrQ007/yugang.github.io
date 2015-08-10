@@ -97,19 +97,17 @@
 	position: relative;
 	padding: .4em .4em .4em .6em;
 	min-height: 0; /* support: IE7 */
-        font-weight: 600;
 	font-size: 80%;
         border: 0px;
         border-top: 1px solid #ffffff;
-        color: #ffffff;
-        background-color: #1ebcba;
+        color: #000000;
+        background-color: #E2FFE7;
 }
 
 .ui-accordion .ui-state-active {
         border: 0px;
         border-top: 1px solid #ffffff;
-        background-color: #ec543b;
-        color: #ffffff;
+        color: #000000;
 }
 
 .ui-accordion .ui-accordion-icons {
@@ -296,15 +294,15 @@ License: MIT
 }
 
 .qa-feature-progress-red {
-    background-color: #ff0909;
+    background-color: #f37183;
 }
 
 .qa-feature-progress-or {
-    background-color: #ffc343;
+    background-color: #ffc000;
 }
 
 .qa-feature-progress-gr {
-    background-color: #51D004;
+    background-color: #93CE7C;
 }
 
 .qa-feature-tt-div, .qa-summary-tt-div, .qa-full-tt-div {
@@ -314,7 +312,7 @@ License: MIT
 }
 
 .qa-feature-warn {
-    color: #ff0909;
+    color: #f37183;
 }
 
 .qa-summary-tt-li, .qa-feature-tt-li, .qa-full-tt-li {
@@ -323,7 +321,7 @@ License: MIT
 } 
 
 .qa-summary-tt-warn {
-    color: #ff0909;
+    color: #f37183;
 }
 
 .qa-summary-tt-span, .qa-feature-tt-span, .qa-full-tt-span {
@@ -356,13 +354,10 @@ License: MIT
     text-align: center;
     padding: 5px 0px 0px 5px;
     font-size: 11px;
-    font-weight: 600;
 }
 
 .qa-summary-progressbar strong i {
-    font-weight: 600;
     font-size: 0.6em;
-    font-weight: normal;
 }
 
 .qa-full-accordion {
@@ -440,22 +435,22 @@ License: MIT
 }
 
 .qa-full-seg-none {
-    background-color: #919191;
+    background-color: #ececec;
 }
 
 .qa-full-seg-info-red{
     text-align: center;
-    background-color: #ff0909;
+    background-color: #f37183;
 }
 
 .qa-full-seg-info-or{
     text-align: center;
-    background-color: #ffc343;
+    background-color: #ffc000;
 }
 
 .qa-full-seg-info-gr{
     text-align: center;
-    background-color: #51D004;
+    background-color: #93CE7C;
 }
 
 .qa-full-more-button {

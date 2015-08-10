@@ -3459,7 +3459,7 @@ function qaSummaryHandler(){
                 $('.qa-summary-progressbar', qualityElement).circleProgress({
                     value: 0,
                     size: 30,
-                    thickness: 5
+                    thickness: 2
                 });
         }
 
@@ -3497,20 +3497,20 @@ function qaSummaryHandler(){
 
                 progressValue = parseInt($('.qa-summary-progressbar', qualityElement).attr('id'))
                 if (progressValue < qaThresholdFail){
-                    fillColor = { color: "#ff0909" }
-                    strongColor = "#ff0909" 
+                    fillColor = { color: "#f37183" }
+                    strongColor = "#000000"
                 } else if (progressValue < qaThresholdWarn){
-                    fillColor = { color: "#ffc343" }
-                    strongColor = "#ffc343"
+                    fillColor = { color: "#ffc000" }
+                    strongColor = "#000000"
                 } else {
-                    fillColor = { color: "#51D004" }
-                    strongColor = "#51D004"
+                    fillColor = { color: "#93CE7C" }
+                    strongColor = "#000000"
                 }
 
                 $('.qa-summary-progressbar', qualityElement).circleProgress({
                     value: progressValue/100,
                     size: 30,
-                    thickness: 5,
+                    thickness: 2,
                     fill: fillColor
                 });
 
@@ -3524,21 +3524,13 @@ function qaSummaryHandler(){
 function updateBuildPanel(panel){
     if (panel.html() != "")
         return
-    var iQualityDesc = {};
-    $.each(reportsJSON, function(buildPath, buildContent){
-        if (buildPath == panel.attr("build")){
-            iQualityDesc["branch"] = buildContent["branch"]
-            iQualityDesc["build"] = buildContent["short_desc"]
-            iQualityDesc["build_content"] = buildContent
-            componentsJsonPath = reportsJSONPath+"/"+buildPath+"/"+"components.json"
-            $.ajax({
-                type: "get",
-                dataType: "json",
-                url: componentsJsonPath,
-                success: updateBuildTable
-            }); 
-        }
-    });
+    componentsJsonPath = reportsJSONPath+"/"+panel.attr("ms")+".components.json"
+    $.ajax({
+        type: "get",
+        dataType: "json",
+        url: componentsJsonPath,
+        success: updateBuildTable
+    }); 
 
     function updateBuildTable(components){
         var listPlatformSeg = {};
@@ -3579,12 +3571,14 @@ function updateBuildPanel(panel){
                     if (segment == "short_desc") return true;
                     if (componentContent[platform] && componentContent[platform][segment]){
                         summary = componentContent[platform][segment]
-                        archDesc = iQualityDesc["build_content"][summary["arch_path"]]["short_desc"]
+                        buildDesc = reportsJSON[summary["build_path"]]["short_desc"]
+                        buildBranch = reportsJSON[summary["build_path"]]["branch"]
+                        archDesc = reportsJSON[summary["build_path"]][summary["arch_path"]]["short_desc"]
                         totalTestNum = parseInt(summary["block"])+parseInt(summary["fail"])+parseInt(summary["pass"])
                         iSegPassrate = Math.ceil((parseInt(summary["pass"])*100)/totalTestNum)
-                        reportURL = reportsDetailsPath+"/"+iQualityDesc["build"]+"/"+summary["arch_path"]+"/"+platform+"/"+segment+"/components.xml#"+componentContent["short_desc"]
-                        var releaseTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Release:</div>"+iQualityDesc["branch"]+"</li>"
-                        var buildDescTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Build:</div>"+iQualityDesc["build"]+"</li>"
+                        reportURL = reportsDetailsPath+"/"+summary["build_path"]+"/"+summary["arch_path"]+"/"+platform+"/"+segment+"/components.xml#"+componentContent["short_desc"]
+                        var releaseTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Release:</div>"+buildBranch+"</li>"
+                        var buildDescTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Build:</div>"+buildDesc+"</li>"
                         var hardwareTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">HW:</div>"+summary["hardware"]+"</li>"
                         var archTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">ARCH:</div>"+archDesc+"</li>"
                         var summaryTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Pass Rate:</div>"+iSegPassrate+"% ("+totalTestNum+" executed, "+summary["pass"]+" passed, "+summary["fail"]+" failed, "+summary["block"]+" blocked)</li>"
@@ -3673,8 +3667,17 @@ function qaFullHandler(){
         $(this).append(buildListHTML)
         var iQuality = new qualityAttrs($(this));
         var qualityTag = $(this)
+        var ms_list = new Array();
         $.each(reportsJSON, function(buildPath, buildContent){
-            $(".qa-full-accordion", qualityTag).append("<h id=\""+buildContent["short_desc"]+"\"><li>Crosswalk "+buildContent["short_desc"]+"</li></h><div build=\""+buildPath+"\"></div>")
+            i_ms = buildPath.split(".")[0]
+            if (ms_list.indexOf(i_ms) < 0) {
+                ms_list.push(i_ms)
+            }
+        });
+
+        $.each(ms_list, function(n, ms){
+            $(".qa-full-accordion", qualityTag).append("<h id=\""+ms+"\"><li>Crosswalk Project"+ms+"</li></h><div ms=\""+ms+"\"></div>")
+
         });
         $(".qa-full-accordion", this).accordion({
             active: false,
@@ -3687,7 +3690,7 @@ function qaFullHandler(){
         if (activeBuild){
             var i = 0
             $(".ui-accordion-header", this).each(function(){
-                if ($(this).attr("id") == activeBuild)
+                if ($(this).attr("id") == activeBuild.split(".")[0])
                     $(".qa-full-accordion", qualityTag).accordion( "option", "active", i);
                 i = i + 1
             });
