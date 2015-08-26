@@ -246,7 +246,7 @@ body .ui-tooltip {
 }
 
 /*!
-jquery-qa-indicator - jQuery Widgets to show Crosswalk QA indicators
+jquery-quality-indicator - Quality Widgets to show Crosswalk quality indicators
 
 Author: Yugang Fan <yugang.fan@intel.com>
 Version: 0.0.1
@@ -305,26 +305,22 @@ License: MIT
     background-color: #93CE7C;
 }
 
-.qa-feature-tt-div, .qa-summary-tt-div, .qa-full-tt-div {
+.qa-quality-tt-div{
     font-size: 65%;
     padding: 5px;
     background-color:#ffffff;
 }
 
-.qa-feature-warn {
-    color: #f37183;
-}
-
-.qa-summary-tt-li, .qa-feature-tt-li, .qa-full-tt-li {
+.qa-quality-tt-li{
     width: 100%;
     list-style-type:none
 } 
 
-.qa-summary-tt-warn {
+.qa-quality-tt-warn {
     color: #f37183;
 }
 
-.qa-summary-tt-span, .qa-feature-tt-span, .qa-full-tt-span {
+.qa-quality-tt-span {
     width: 70px;
     font-size:12px;
     color:#1ebcba;
@@ -333,7 +329,7 @@ License: MIT
     display: inline-block;
 } 
 
-.qa-summary-progressbar {
+.qa-build-progressbar {
     width: 30px;
     margin: 1px 1px 1px;
     display: inline-block;
@@ -341,11 +337,11 @@ License: MIT
     text-align: center;
 }
 
-.qa-summary-progressbar canvas {
+.qa-build-progressbar canvas {
     vertical-align: top;
 }
 
-.qa-summary-progressbar strong {
+.qa-build-progressbar strong {
     position: absolute;
     top: 0;
     left: 0;
@@ -356,16 +352,16 @@ License: MIT
     font-size: 11px;
 }
 
-.qa-summary-progressbar strong i {
+.qa-build-progressbar strong i {
     font-size: 0.6em;
 }
 
-.qa-full-accordion {
+.qa-dashboard-accordion {
     width: 100%;
     padding: 0px;
 }
 
-.qa-full-table {
+.qa-dashboard-table, .qa-quality-table{
     min-width: 100%;
     color: #000000;
     text-align: left;
@@ -374,20 +370,22 @@ License: MIT
     background-color: #ffffff;
 }
 
-.qa-full-table tr:nth-of-type(2n) {
+.qa-dashboard-table tr:nth-of-type(2n), .qa-quality-table tr:nth-of-type(2n) {
     background-color: #ffffff;
 }
 
-.qa-full-table th, .qa-full-table td {
+.qa-dashboard-table th, .qa-dashboard-table td, .qa-quality-table th, .qa-quality-table td {
     border-bottom: 1px solid #000000;
     padding: 0.1em;
 }
-
-.qa-full-platform-th {
+.qa-quality-th{
     text-align: center;
+    font-weight: 600;
+    word-wrap: break-word;
+    min-width: 20px;
 }
 
-.qa-full-seg-td {
+.qa-dashboard-seg-td {
     font-weight: 600;
     width: auto;
     min-width: 20px;
@@ -395,65 +393,65 @@ License: MIT
     text-align: center;
 }
 
-.qa-full-seg-info {
+.qa-dashboard-seg-info {
     width: auto;
     word-wrap: break-word;
     color: #ffffff;
 }
 
-.qa-full-table .qa-full-component-th {
+.qa-dashboard-table .qa-dashboard-component-th {
     width: 20%;
     font-weight: 600;
     word-wrap: break-word;
 }
 
-.qa-full-table .qa-full-issue-th {
+.qa-dashboard-table .qa-dashboard-issue-th {
     width: 70px;
     font-weight: 600;
     word-wrap: break-word;
 }
 
-.qa-full-table .qa-full-component-info {
+.qa-dashboard-table .qa-dashboard-component-info {
     width: 20%;
     word-wrap: break-word;
 }
 
-.qa-full-table .qa-full-issue-info {
+.qa-dashboard-table .qa-dashboard-issue-info {
     width: 70px;
 }
 
-.qa-full-platform-title {
+.qa-dashboard-platform-title {
     margin-right: 0.3em;
 }
 
-.qa-full-info-title {
+.qa-dashboard-info-title {
    font-weight: 600; 
 }
 
-.qa-full-info-span {
+.qa-dashboard-info-span {
     display: none;
 }
 
-.qa-full-seg-none {
+.qa-quality-seg-none{
     background-color: #ececec;
 }
 
-.qa-full-seg-info-red{
+.qa-quality-seg-info-red{
     text-align: center;
     background-color: #f37183;
 }
 
-.qa-full-seg-info-or{
+.qa-quality-seg-info-or{
     text-align: center;
     background-color: #ffc000;
 }
 
-.qa-full-seg-info-gr{
+.qa-quality-seg-info-gr{
     text-align: center;
     background-color: #93CE7C;
 }
 
-.qa-full-more-button {
+.qa-dashboard-more-button {
     margin: 0.2em;
     padding: 0px;
     font-size: 70%;
@@ -461,4 +459,16 @@ License: MIT
     border: 0px;
     background-color: transparent;
     color: #1ebcba;     
+}
+
+.qa-featuredb-div, .qa-builddb-div{
+    padding: 0.2em;
+    background-color: #ffffff;
+}
+
+.qa-featuredb-seg-info a, .qa-builddb-seg-info a {
+   text-align: center;
+   color: #000000;
+   text-shadow: none;
+   text-decoration: underline;
 }

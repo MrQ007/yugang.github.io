@@ -12,13 +12,11 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-3676": {
-                "desc": "XWALK-3676",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-3676"
-            }
-        },
-        "short_desc": "Cordova"
+        "issues": [
+            "XWALK-2624",
+            "XWALK-2648",
+            "XWALK-3676"
+        ]
     },
     "Cordova Features/Mobile Spec": {
         "android": {
@@ -33,8 +31,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Cordova Features/Mobile Spec"
+        "issues": []
     },
     "Cordova Sample Apps/Gallery": {
         "android": {
@@ -49,8 +46,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Cordova Sample Apps/Gallery"
+        "issues": []
     },
     "Cordova Web Apps/WebApp": {
         "android": {
@@ -65,8 +61,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Cordova Web Apps/WebApp"
+        "issues": []
     },
     "Crosswalk Use Cases/Embedding API": {
         "android": {
@@ -81,13 +76,12 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-3897": {
-                "desc": "XWALK-3897",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-3897"
-            }
-        },
-        "short_desc": "Crosswalk Use Cases/Embedding API"
+        "issues": [
+            "XWALK-2012",
+            "XWALK-3889",
+            "XWALK-3897",
+            "XWALK-4262"
+        ]
     },
     "Crosswalk Use Cases/WRT": {
         "android": {
@@ -102,13 +96,11 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-3108": {
-                "desc": "XWALK-3108",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-3108"
-            }
-        },
-        "short_desc": "Crosswalk Use Cases/WRT"
+        "issues": [
+            "XWALK-3108",
+            "XWALK-3330",
+            "XWALK-3594"
+        ]
     },
     "Crosswalk Use Cases/WebAPI": {
         "android": {
@@ -132,13 +124,9 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-3844": {
-                "desc": "XWALK-3844",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-3844"
-            }
-        },
-        "short_desc": "Crosswalk Use Cases/WebAPI"
+        "issues": [
+            "XWALK-3844"
+        ]
     },
     "Device & Hardware": {
         "android": {
@@ -162,13 +150,12 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-1457": {
-                "desc": "XWALK-1457",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-1457"
-            }
-        },
-        "short_desc": "Device & Hardware"
+        "issues": [
+            "XWALK-1457",
+            "XWALK-1693",
+            "XWALK-2666",
+            "XWALK-4111"
+        ]
     },
     "Experimental API": {
         "android": {
@@ -192,8 +179,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Experimental API"
+        "issues": []
     },
     "Manifest": {
         "android": {
@@ -208,8 +194,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Manifest"
+        "issues": []
     },
     "Multimedia & Graphics": {
         "android": {
@@ -233,17 +218,10 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-2663": {
-                "desc": "XWALK-2663",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-2663"
-            },
-            "XWALK-2988": {
-                "desc": "XWALK-2988",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-2988"
-            }
-        },
-        "short_desc": "Multimedia & Graphics"
+        "issues": [
+            "XWALK-2663",
+            "XWALK-2988"
+        ]
     },
     "Network & Storage": {
         "android": {
@@ -258,13 +236,9 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-1105": {
-                "desc": "XWALK-1105",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-1105"
-            }
-        },
-        "short_desc": "Network & Storage"
+        "issues": [
+            "XWALK-1105"
+        ]
     },
     "Networking & Storage": {
         "android": {
@@ -279,13 +253,9 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-1105": {
-                "desc": "XWALK-1105",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-1105"
-            }
-        },
-        "short_desc": "Networking & Storage"
+        "issues": [
+            "XWALK-1105"
+        ]
     },
     "Performance & Optimization": {
         "android": {
@@ -309,8 +279,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Performance & Optimization"
+        "issues": []
     },
     "Sample Apps": {
         "android": {
@@ -325,13 +294,10 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-4010": {
-                "desc": "XWALK-4010",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-4010"
-            }
-        },
-        "short_desc": "Sample Apps"
+        "issues": [
+            "XWALK-2223",
+            "XWALK-4010"
+        ]
     },
     "Scheme": {
         "android": {
@@ -346,8 +312,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Scheme"
+        "issues": []
     },
     "Security": {
         "android": {
@@ -362,8 +327,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Security"
+        "issues": []
     },
     "Third Party Framework": {
         "android": {
@@ -378,8 +342,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "Third Party Framework"
+        "issues": []
     },
     "UI": {
         "android": {
@@ -403,8 +366,7 @@
             },
             "short_desc": "Android"
         },
-        "issues": {},
-        "short_desc": "UI"
+        "issues": []
     },
     "sample": {
         "android": {
@@ -428,12 +390,9 @@
             },
             "short_desc": "Android"
         },
-        "issues": {
-            "XWALK-3768": {
-                "desc": "XWALK-3768",
-                "url": "https://crosswalk-project.org/jira/browse/XWALK-3768"
-            }
-        },
-        "short_desc": "sample"
+        "issues": [
+            "XWALK-3639",
+            "XWALK-3768"
+        ]
     }
 }

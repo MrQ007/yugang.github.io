@@ -17,9 +17,8 @@
         timeout: 2000
       };
     </script>
-    <script src="/qa/js/jquery.min.js"></script>
-    <script defer src="/qa/js/webfont.js"></script>
-    <script src="/qa/js/qa.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script async defer src="//ajax.googleapis.com/ajax/libs/webfont/1.5.3/webfont.js"></script>
     <link rel="stylesheet" href="/css/main.css">
 
     <meta name="description" content="Enable the most advanced web innovations with the Crosswalk Project web runtime to develop powerful Android and Cordova apps." />
@@ -50,6 +49,7 @@
     <script src="/js/versions.js"></script>
     <script src="/js/demos.js"></script>
     <script src="/js/tools.js"></script>
+    <script src="/qa/js/qa.js"></script>
 
   </head>
   <body>
@@ -108,7 +108,7 @@
   </header>
   
   <p>Crosswalk 14 is in beta! Starting from this release, Crosswalk is <a href="https://play.google.com/store/apps/details?id=org.xwalk.core&amp;hl=en">available</a> in the Google Play Store and applications can be configured to download it on demand. Also, this release comes with the usual update to Chromium (M43)and introduces the WebCL API for devices that support OpenCL. Finally, we have added SIMD support for code written in asm.js.  </p>
-<h2>Shared Crosswalk runtime available in the Google Play Store</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-arch="X86" test-build="14.43.343.9" test-feature="Shared Runtime in Google Play"></quality>
+<h2>Shared Crosswalk runtime available in the Google Play Store</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-milestone="14" test-feature="Shared Runtime in Google Play"></quality>
 
 <p>You can now package your application in “shared mode”. This means that your application’s APK won’t include the Crosswalk runtime, which will be downloaded from the Play Store when the application is first started. From that point on, the Crosswalk runtime will be shared with any other Crosswalk application that is also packaged in shared mode. The advantage is that your APK doesn’t need to include the Crosswalk library, making it a lot smaller. A few things to notice:</p>
 <ul>
@@ -121,22 +121,22 @@
 <pre><code>./make_apk.py --mode=shared ...
 </code></pre><p>To create a cordova project in shared mode, use the option:</p>
 <pre><code>./bin/create --xwalk-shared-library ...
-</code></pre><h2>Chromium 43</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-arch="X86" test-build="14.43.343.9" test-feature="Chromium 43 New Features"></quality>
+</code></pre><h2>Chromium 43</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-milestone="15" test-feature="XWALK-3810"></quality>
 
 <p>Chromium 43 introduces Web MIDI support, new features to improve security and compatibility and a number of small changes to enable developers to build more powerful web applications. For more information see the <a href="http://blog.chromium.org/2015/04/chrome-43-beta-web-midi-and-upgrading.html">announcement</a> in the Chromium Developers blog.</p>
-<h2>WebCL</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-arch="X86" test-build="14.43.343.9" test-feature="WebCL"></quality>
+<h2>WebCL</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-milestone="14" test-feature="WebCL"></quality>
 
 <p><a href="https://www.khronos.org/webcl/">WebCL</a> defines a JavaScript binding to the Khronos <a href="https://www.khronos.org/opencl/">OpenCL</a> standard for heterogeneous parallel computing. WebCL enables web applications to harness GPU and multi-core CPU parallel processing and achieve significant acceleration. The WebCL API first landed in Crosswalk Canary (version 13.41.304.0) as an experimental feature, and is now enabled by default on Android.</p>
 <p>Because WebCL feature depends on the OpenCL library, before you try it, please make sure that “libPVROCL.so<em>” or “libOpenCL.so</em>” are present under “/system/vendor/lib” folder on the device. The WebCL feature was verified on a Asus MemoPad8 and Xiaomi3. You can also check the OpenCL support with an application like <a href="https://play.google.com/store/apps/details?id=com.xh.openclinfo">OpenCL Info</a>.</p>
-<h2>SIMD.js and ASM.js optimizations in V8 Turbo Fan</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-arch="X86" test-build="14.43.343.9" test-feature="SIMD"></quality>
+<h2>SIMD.js and ASM.js optimizations in V8 Turbo Fan</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-milestone="14" test-feature="SIMD"></quality>
 
 <p><a href="http://asmjs.org/">asm.js</a> is a highly optimizable, low-level subset of JavaScript. With the newly introduced TurboFan engine, V8 is able to recognize asm.js module (“use asm” directive) and emits very efficient machine code. Crosswalk 14 adds the SIMD.js support to the TurboFan engine. It allows web developers to utilize SIMD.js API in asm.js code or cross-compile C/C++ code with SSE intrinsics to asm.js with SIMD.js via <a href="http://kripken.github.io/emscripten-site/index.html">emscripten</a>.</p>
-<h2>Embedding API Updates</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-arch="X86" test-build="14.43.343.9" test-feature="Embedding API"></quality>
+<h2>Embedding API Updates</h2><quality test-type="feature" test-segment="Embedded Crosswalk" test-milestone="14" test-feature="Embedding API"></quality>
 
 <p>The Crosswalk XwalkView class has a new method to control whether its surface is placed on top of its window. Note that this only works when XWalkPreferences.ANIMATABLE_XWALK_VIEW is false.</p>
 <p><code>public void setZOrderOnTop (boolean onTop);</code></p>
 <h2>Notable bug fixes</h2><p>The --disk-cache-size command line switch now behaves as expected (bug XWALK-3821)</p>
-<h2>Quality Summary</h2><p>Please view the <a href="/documentation/quality_dashboard.html?build=14.43.343.9">Quality Dashboard</a> for detailed quality summary of this release.</p>
+<h2>Quality Summary</h2><p>Please view the <a href="/documentation/quality_dashboard.html?milestone=14&amp;dashboard=features">Quality Dashboard</a> for detailed quality summary of this release.</p>
   <a href="http://twitter.com/xwalk_project" class="article-promo well">
   <h4 class="article-promoTitle">Get more hybrid app secrets</h4>
   <p>Build powerful hybrid apps for Android or Cordova / PhoneGap more reliably with <span class="a-faux">tips from the Intel Crosswalk team</span>.</p>
@@ -164,8 +164,8 @@
              Latest blog post:</br>
               
               
-                <b><a href="/blog">Introducing the Crosswalk Project for iOS</a></b><br/>
-                &nbsp;(<span ><time class="js-vagueTime" datetime="Fri, 26 Jun 2015 12:00:00 GMT">2015-06-26T12:00</time></span>)
+                <b><a href="/blog">Crosswalk received <i>2015 Outstanding Open Source Project</i> award</a></b><br/>
+                &nbsp;(<span ><time class="js-vagueTime" datetime="Fri, 10 Jul 2015 12:00:00 GMT">2015-07-10T12:00</time></span>)
               
               <br/>
            </div>

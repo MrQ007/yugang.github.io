@@ -3238,7 +3238,7 @@ License: MIT
 })(jQuery);
 
 /*!
-jquery-qa-indicator - jQuery Widgets to show Crosswalk QA indicators
+jquery-quality-indicator - Quality Widgets to show Crosswalk quality indicators
 
 Author: Yugang Fan <yugang.fan@intel.com>
 Version: 0.0.1
@@ -3246,12 +3246,14 @@ License: MIT
 */
 
 var reportsJSONPath = "/qa/reports"
-var reportsDetailsPath = "http://yugang.github.io/xml"
+var reportsDetailsPath = "http://crosswalk-project.github.io/crosswalk-test-results/reports"
+var ticketsPath = "https://crosswalk-project.org/jira/browse"
 var reportsJSONFile = reportsJSONPath+"/"+"reports.json";
 var reportsJSON = {};
-var qaThresholdPass = 90;
-var qaThresholdWarn = 80;
-var qaThresholdFail = 60;
+var featuresJSON = {};
+var keyBlackList = ["issues", "short_desc", "tests", "branch", "features_active", "components_active"];
+var qaThresholdPass = 80;
+var qaThresholdWarn = 60;
 var tableUpdatedNum = 15;
 
 function importCSS(elementID, CSSPath){
@@ -3270,6 +3272,7 @@ importCSS('qa-css', '/qa/css/qa.css');
 
 function qualityAttrs(qualityTag) {
     this.type = qualityTag.attr("test-type");
+    this.ms = qualityTag.attr("test-milestone");
     this.build = qualityTag.attr("test-build");
     this.platform = qualityTag.attr("test-platform");
     this.arch = qualityTag.attr("test-arch");
@@ -3277,91 +3280,118 @@ function qualityAttrs(qualityTag) {
     this.feature = qualityTag.attr("test-feature");
 }
 
-function qaFeatureHandler(){
-    $( "quality[test-type='feature']" ).each(function() {
-        var qualityElement = this;
-        var qualityData = false;
-        var featureJSON = {};
-        var iQuality = new qualityAttrs($(this));
-        $.each(reportsJSON, function(buildPath, buildContent){
-            if (buildPath == iQuality.build || buildContent["short_desc"] == iQuality.build){
-                $.each(buildContent, function(archPath, archContent){
-                    if (archPath == "short_desc" || archPath == "branch") return true;
-                    if (archPath == iQuality.arch || archContent.short_desc == iQuality.arch){
-                        $.each(archContent, function(platformPath, platformContent){
-                            if (platformPath == "short_desc") return true;
-                            $.each(platformContent, function(segmentPath, segmentContent){
-                                if (segmentPath == "short_desc") return true;
-                                if (segmentPath == iQuality.segment || segmentContent["short_desc"] == iQuality.segment){
-                                    if (!segmentContent.hasOwnProperty("features")){
-                                        featuresJsonPath = reportsJSONPath+"/"+buildPath+"/"+archPath+"/"+platformPath+"/"+segmentPath+"/features.json"
-                                        $.ajax({
-                                            type: "get",
-                                            dataType: "json",
-                                            async: false,
-                                            url: featuresJsonPath,
-                                            success: function(features){
-                                                reportsJSON[buildPath][archPath][platformPath][segmentPath]["features"] = features
-                                            },
-                                            error: function (i, t, e){
-                                                updateFeatureWarning("Fail to get the feature data: "+e)
-                                            }
-                                        });
-                                    }
-
-                                    featuresContent = reportsJSON[buildPath][archPath][platformPath][segmentPath]["features"]
-                                    $.each(featuresContent, function(featurePath, featureDetails){
-                                        if (featurePath == iQuality.feature || featureDetails["short_desc"] == iQuality.feature){
-                                            qualityData = true;
-                                            featureJSON[platformPath] = featureDetails
-                                            featureJSON[platformPath]["branch"] = buildContent["branch"]
-                                            featureJSON[platformPath]["build"] = buildContent["short_desc"]
-                                            featureJSON[platformPath]["arch"] = archContent["short_desc"]
-                                            featureJSON[platformPath]["platform"] = platformContent["short_desc"]
-                                            featureJSON[platformPath]["segment"] = segmentContent["short_desc"]
-                                            featureJSON[platformPath]["details_url"] = reportsDetailsPath+"/"+buildPath+"/"+archPath+"/"+platformPath+"/"+segmentPath+"/features.xml#"+featureDetails["short_desc"]
+function getReportDesc(pathDict){
+        reportDesc = {}
+        $.each(reportsJSON, function(buildName, buildContent){
+            if (pathDict.build && (buildName == pathDict.build || buildContent["short_desc"] == pathDict.build)){
+                reportDesc["branch"] = buildContent["branch"]
+                reportDesc["build"] = buildContent["short_desc"]
+                $.each(buildContent, function(archName, archContent){
+                    if ($.inArray(archName, keyBlackList) >= 0) return true;
+                    if (pathDict.arch && (archName == pathDict.arch || archContent["short_desc"] == pathDict.arch)){
+                            reportDesc["arch"] = archContent["short_desc"]
+                            $.each(archContent, function(platformName, platformContent){
+                                if ($.inArray(platformName, keyBlackList) >= 0) return true;
+                                if (pathDict.platform && (platformName == pathDict.platform || platformContent["short_desc"] == pathDict.platform)){
+                                    reportDesc["platform"] = platformContent["short_desc"]
+                                    $.each(platformContent, function(segmentName, segmentContent){
+                                        if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+                                        if (pathDict.segment && (segmentName == pathDict.segment || segmentContent["short_desc"] == pathDict.segment)){
+                                            reportDesc["segment"] = segmentContent["short_desc"]    
                                         }
                                     });
                                 }
                             });
-                        });
-                    }
-                }); 
+                }
+                });
             }
         });
+        return reportDesc
+}
 
-        if (!qualityData){
-            updateFeatureWarning("Not found the feature data ...")
+function qaFeatureHandler(){
+    $( "quality[test-type='feature']" ).each(function() {
+        var qualityTag = this;
+        var qualityData = false;
+        var featureJSON = {};
+        var iQuality = new qualityAttrs($(this));
+        featuresJSONPath = reportsJSONPath+"/"+iQuality.ms+".features.json"
+        if (!featuresJSON.hasOwnProperty(featuresJSONPath)) {
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url: featuresJSONPath,
+                success: function(feature){
+                    featuresJSON[featuresJSONPath] = feature
+                    updateFeaturePanel()
+                },
+                error: function(){
+                    updateFeatureWarning("Fail to get JSON data ......")
+                }
+            });
+        } else {
+            updateFeaturePanel()
         }
 
         function updateFeatureWarning(info){
-            $(qualityElement).append("<div class=\"qa-feature-div inline-box\"><span class=\"qa-feature-title inline-box\">Feature Quality:</span><span class=\"qa-feature-warn inline-box\">"+info+"</span><div>");
+            $(qualityTag).append("<div class=\"qa-feature-div inline-box\"><span class=\"qa-feature-title inline-box\">Feature Quality:</span><span class=\"qa-quality-tt-warn inline-box\">"+info+"</span><div>");
+        }
+
+        function updateFeaturePanel(){
+            $.each(featuresJSON[featuresJSONPath], function(featureName, featureContent) {
+                if (featureName == iQuality.feature || featureContent.short_desc == iQuality.feature){
+			$.each(featureContent, function(platformName, platformContent){
+			    if ($.inArray(platformName, keyBlackList) >= 0) return true;
+			    $.each(platformContent, function(segmentName, segmentContent){
+				if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+				if (segmentName == iQuality.segment || segmentContent.short_desc == iQuality.segment){
+				     qualityData = true
+				     var reportItemPath = {}
+				     reportItemPath["build"] = segmentContent["build_path"]
+				     reportItemPath["arch"] = segmentContent["arch_path"]
+				     reportItemPath["platform"] = platformName
+				     var reportsItemDesc = getReportDesc(reportItemPath)
+				     featureJSON[platformName] = segmentContent
+				     featureJSON[platformName]["branch"] = reportsItemDesc["branch"]
+				     featureJSON[platformName]["build"] = reportsItemDesc["build"]
+				     featureJSON[platformName]["arch"] = reportsItemDesc["arch"]
+				     featureJSON[platformName]["platform"] = reportsItemDesc["platform"]
+				     featureJSON[platformName]["details_url"] = reportsDetailsPath+"/"+segmentContent["build_path"]+"/"+segmentContent["arch_path"]+"/"+platformName+"/"+segmentName+"/features.xml#"+featureName
+				}
+			    });
+			});
+                } 
+            });
+
+        if (!qualityData){
+            updateFeatureWarning("Not found the feature data ...")
         }
 
         var progressHTML = "";
         var bugListHTML = "";
         var issuesList = [];
 
-        $.each(featureJSON, function(platformPath, featureDetails){
+        $.each(featureJSON, function(platformName, featureDetails){
             var progressbarSpanHTML = ""
             featurePassRate = Math.ceil((parseInt(featureDetails["pass"]*100))/(parseInt(featureDetails["block"])+parseInt(featureDetails["fail"])+parseInt(featureDetails["pass"])))
-            if (featurePassRate < qaThresholdFail){
+            if (featurePassRate < qaThresholdWarn){
                 progressbarSpanHTML = "<span style=\"width:"+featurePassRate+"%;\" class=\"qa-feature-progress-red\">"+featurePassRate+"%</span>"
-            } else if (featurePassRate < qaThresholdWarn){
+            } else if (featurePassRate < qaThresholdPass){
                 progressbarSpanHTML = "<span style=\"width:"+featurePassRate+"%;\" class=\"qa-feature-progress-or\">"+featurePassRate+"%</span>"
             } else {
                 progressbarSpanHTML = "<span style=\"width:"+featurePassRate+"%;\" class=\"qa-feature-progress-gr\">"+featurePassRate+"%</span>"
             }
 
-            progressHTML += "<span class=\"qa-feature-item inline-box\" id=\""+platformPath+"\"><span class=\"qa-feature-platform-title inline-box\">"+featureJSON[platformPath]["platform"]+"</span><div class=\"qa-feature-progressbar inline-box\">"+progressbarSpanHTML+"</div></span>"
+            progressHTML += "<span class=\"qa-feature-item inline-box\" id=\""+platformName+"\"><span class=\"qa-feature-platform-title inline-box\">"+featureJSON[platformName]["platform"]+"</span><div class=\"qa-feature-progressbar inline-box\">"+progressbarSpanHTML+"</div></span>"
 
             if (featureDetails.hasOwnProperty("issues")){
-                $.each(featureDetails["issues"], function(issueName, issue){
+                $.each(featureDetails["issues"], function(issueIndex, issueName){
                     if ($.inArray(issueName, issuesList) >= 0){
                         return true
                     }
                     issuesList.push(issueName)
-                    bugListHTML += "<a href=\""+issue.url+"\">"+issueName+"</a> "
+                    issueURL = ticketsPath+"/"+issueName
+                    bugListHTML += "<a href=\""+issueURL+"\">"+issueName+"</a> "
                 });
             }
         });
@@ -3374,20 +3404,20 @@ function qaFeatureHandler(){
             bugListHTML = "No issues"
         }
 
-        $(this).append("<div class=\"qa-feature-div inline-box\"><span class=\"qa-feature-title inline-box\">Feature Quality:</span>"+progressHTML+"<span class=\"qa-feature-desc inline-box\">Known Issues: "+bugListHTML+"</span><div>");
-        $(".qa-feature-div", this).tooltip({
+        $(qualityTag).append("<div class=\"qa-feature-div inline-box\"><span class=\"qa-feature-title inline-box\">Feature Quality:</span>"+progressHTML+"<span class=\"qa-feature-desc inline-box\">Known Issues: "+bugListHTML+"</span><div>");
+        $(".qa-feature-div", qualityTag).tooltip({
             items: ".qa-feature-item",
             content:function() {
-                var platformPath = $(this).attr('id');
-                var totalCaseNum = parseInt(featureJSON[platformPath]["pass"])+parseInt(featureJSON[platformPath]["fail"])+parseInt(featureJSON[platformPath]["block"])
-                var platformListHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">Release:</div>"+featureJSON[platformPath]["branch"]+"</li>"
-                var buildTTHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">Build:</div>"+featureJSON[platformPath]["build"]+"</li>"
-                var hardwareTTHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">HW:</div>"+featureJSON[platformPath]["hardware"]+"</li>"
-                var archTTHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">ARCH:</div>"+featureJSON[platformPath]["arch"]+"</li>"
-                var segmentTTHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">Segment:</div>"+featureJSON[platformPath]["segment"]+"</li>"
-                var totalCaseTTHTML = "<li class=\"qa-feature-tt-li\"><div class=\"qa-feature-tt-span\">Total Tests:</div>"+totalCaseNum+"</li>"
-                var reportLinkTTHTML = "<a href=\""+featureJSON[platformPath]["details_url"].replace(/\ /g,"%20")+"\"><span class=\"a-faux\">See detailed results ....</span></a>"
-                return "<div class=\"qa-feature-tt-div\">"+platformListHTML+buildTTHTML+hardwareTTHTML+archTTHTML+segmentTTHTML+totalCaseTTHTML+reportLinkTTHTML+"</div>"
+                var platformName = $(this).attr('id');
+                var totalCaseNum = parseInt(featureJSON[platformName]["pass"])+parseInt(featureJSON[platformName]["fail"])+parseInt(featureJSON[platformName]["block"])
+                var platformListHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Release:</div>"+featureJSON[platformName]["branch"]+"</li>"
+                var buildTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Build:</div>"+featureJSON[platformName]["build"]+"</li>"
+                var hardwareTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">HW:</div>"+featureJSON[platformName]["hardware"]+"</li>"
+                var archTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">ARCH:</div>"+featureJSON[platformName]["arch"]+"</li>"
+                var segmentTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Segment:</div>"+featureJSON[platformName]["short_desc"]+"</li>"
+                var totalCaseTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Total Tests:</div>"+totalCaseNum+"</li>"
+                var reportLinkTTHTML = "<a href=\""+featureJSON[platformName]["details_url"].replace(/\ /g,"%20")+"\"><span class=\"a-faux\">See detailed results ....</span></a>"
+                return "<div class=\"qa-quality-tt-div\">"+platformListHTML+buildTTHTML+hardwareTTHTML+archTTHTML+segmentTTHTML+totalCaseTTHTML+reportLinkTTHTML+"</div>"
            },
            close: function(event, ui) {
                ui.tooltip.hover(function () {
@@ -3397,42 +3427,37 @@ function qaFeatureHandler(){
                });
            }
         });
+    }
     });
 }
 
-function qaSummaryHandler(){
-    $( "quality[test-type='summary']" ).each(function() {
-        var qualityElement = this;
+function qaBuildHandler(){
+    $( "quality[test-type='build']" ).each(function() {
+        var qualityTag = this;
         var qualityData = false;
         var iQuality = new qualityAttrs($(this));
         var iQualityDesc = {};
-        $.each(reportsJSON, function(buildPath, buildContent){
-            if (buildPath == iQuality.build || buildContent["short_desc"] == iQuality.build){
+        $.each(reportsJSON, function(buildName, buildContent){
+            if (buildName == iQuality.build || buildContent["short_desc"] == iQuality.build){
                 iQualityDesc["branch"] = buildContent["branch"]
                 iQualityDesc["build"] = buildContent["short_desc"]
-                $.each(buildContent, function(archPath, archContent){
-                    if (archPath == "short_desc") return true;
-                    if (archPath == iQuality.arch || archContent["short_desc"] == iQuality.arch){
+                iQualityDesc["build_path"] = buildName
+                $.each(buildContent, function(archName, archContent){
+                    if ($.inArray(archName, keyBlackList) >= 0) return true;
+                    if (archName == iQuality.arch || archContent["short_desc"] == iQuality.arch){
                             iQualityDesc["arch"] = archContent["short_desc"]
-			    $.each(archContent, function(platformPath, platformContent){
-				if (platformPath == "short_desc") return true;
-				if (platformPath == iQuality.platform || platformContent["short_desc"] == iQuality.platform){
+                            iQualityDesc["arch_path"] = archName
+			    $.each(archContent, function(platformName, platformContent){
+                                if ($.inArray(platformName, keyBlackList) >= 0) return true;
+				if (platformName == iQuality.platform || platformContent["short_desc"] == iQuality.platform){
                                     iQualityDesc["platform"] = platformContent["short_desc"]
-				    $.each(platformContent, function(segmentPath, segmentContent){
-					if (segmentPath == "short_desc") return true;
-					if (segmentPath == iQuality.segment || segmentContent["short_desc"] == iQuality.segment){
-                                                iQualityDesc["segment"] = segmentContent["short_desc"]
-                                                qualityData = true
-						summaryJsonPath = reportsJSONPath+"/"+buildPath+"/"+archPath+"/"+platformPath+"/"+segmentPath+"/summary.json"
-						$.ajax({
-						    type: "get",
-						    dataType: "json",
-						    url: summaryJsonPath,
-						    success: updateSummaryPanel,
-                                                    error: function (i, t, e){
-                                                        updateSummaryWarning("Fail to get the summary data: "+e)
-                                                    }
-						});
+                                    iQualityDesc["platform_path"] = platformName
+				    $.each(platformContent, function(segmentName, segmentContent){
+                                        if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+					if (segmentName == iQuality.segment || segmentContent["short_desc"] == iQuality.segment){
+                                            iQualityDesc["segment_path"] = segmentName
+                                            updateBuildPanel(segmentContent)
+                                            qualityData = true
 					}
 				    });
 				}
@@ -3443,48 +3468,48 @@ function qaSummaryHandler(){
         });
         
         if (!qualityData){
-            updateSummaryWarning("Not found the summary data ...")
+            updateBuildWarning("Not found the summary data ...")
         }
 
-        function updateSummaryWarning(info){
-                var progressHTML =  "<div class=\"qa-summary-progressbar\"><strong class=\"qa-summary-rate\">N/A</strong></div>";
-                $(qualityElement).append(progressHTML);
-                $("div", qualityElement).tooltip({
-                        items: ".qa-summary-progressbar",
-                        content:function() {
-                            var warningTTHTML = "<li class=\"qa-summary-tt-li qa-summary-tt-warn\">"+info+"</li>"
-                            return "<div class=\"qa-summary-tt-div\">"+warningTTHTML+"</div>"
-                        }
+        function updateBuildWarning(info){
+                var progressHTML =  "<div class=\"qa-build-progressbar\"><strong class=\"qa-build-rate\">N/A</strong></div>";
+                $(qualityTag).append(progressHTML);
+                $("div", qualityTag).tooltip({
+                    items: ".qa-build-progressbar",
+                    content:function() {
+                        var warningTTHTML = "<li class=\"qa-quality-tt-li qa-quality-tt-warn\">"+info+"</li>"
+                        return "<div class=\"qa-quality-tt-div\">"+warningTTHTML+"</div>"
+                    }
                 });
-                $('.qa-summary-progressbar', qualityElement).circleProgress({
+                $('.qa-build-progressbar', qualityTag).circleProgress({
                     value: 0,
                     size: 30,
                     thickness: 2
                 });
         }
 
-        function updateSummaryPanel(summary){
+        function updateBuildPanel(summary){
 		var summaryPassRate = Math.ceil((parseInt(summary["pass"])*100)/(parseInt(summary["block"])+parseInt(summary["fail"])+parseInt(summary["pass"])))
-		var progressHTML =  "<div class=\"qa-summary-progressbar\" id=\""+summaryPassRate+"\"><strong class=\"qa-summary-rate\"></strong></div>"; 
+		var progressHTML =  "<div class=\"qa-build-progressbar\" id=\""+summaryPassRate+"\"><strong class=\"qa-build-rate\"></strong></div>"; 
 		if (progressHTML == ""){
 		    return true
 		}
-		$(qualityElement).append(progressHTML);
+		$(qualityTag).append(progressHTML);
 
-		$("div", qualityElement).tooltip({
-			items: ".qa-summary-progressbar",
+		$("div", qualityTag).tooltip({
+                        items: ".qa-build-progressbar",
 			content:function() {
 			    var element = $( this );
-                            var releaseTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">Release:</div>"+iQualityDesc["branch"]+"</li>"
-                            var platformTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">Platform:</div>"+iQualityDesc["platform"]+"</li>"
-                            var hardwareTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">HW:</div>"+summary["hardware"]+"</li>"
-		            var archTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">ARCH:</div>"+iQualityDesc["arch"]+"</li>"
-                            var segmentTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">Segment:</div>"+iQualityDesc["segment"]+"</li>"
-                            var summaryTTHTML = "<li class=\"qa-summary-tt-li\"><div class=\"qa-summary-tt-span\">Details:</div>"+summary["desc"]+"("+(parseInt(summary["pass"])+parseInt(summary["fail"])+parseInt(summary["block"]))+" executed, "+summary["pass"]+" passed, "+summary["fail"]+" failed, "+summary["block"]+" blocked)"+"</li>"
-                            var reportLinkURL = "/documentation/quality_dashboard.html?build="+iQualityDesc["build"]
-                            var reportLinkTTHTML = "<a href=\""+reportLinkURL.replace(/\ /g,"%20")+"\"><span class=\"a-faux\">See full test reports ....</span></a>"
+                            var releaseTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Release:</div>"+iQualityDesc["branch"]+"</li>"
+                            var platformTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Platform:</div>"+iQualityDesc["platform"]+"</li>"
+                            var hardwareTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">HW:</div>"+summary["hardware"]+"</li>"
+		            var archTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">ARCH:</div>"+iQualityDesc["arch"]+"</li>"
+                            var segmentTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Segment:</div>"+summary["short_desc"]+"</li>"
+                            var summaryTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Details:</div>"+summary["desc"]+"("+(parseInt(summary["pass"])+parseInt(summary["fail"])+parseInt(summary["block"]))+" executed, "+summary["pass"]+" passed, "+summary["fail"]+" failed, "+summary["block"]+" blocked)"+"</li>"
+                            var reportLinkURL = reportsDetailsPath+"/"+iQualityDesc["build_path"]+"/"+iQualityDesc["arch_path"]+"/"+iQualityDesc["platform_path"]+"/"+iQualityDesc["segment_path"]+"/components.xml"
+                            var reportLinkTTHTML = "<a href=\""+reportLinkURL.replace(/\ /g,"%20")+"\"><span class=\"a-faux\">See build test reports ....</span></a>"
 
-                            return "<div class=\"qa-summary-tt-div\">"+releaseTTHTML+platformTTHTML+hardwareTTHTML+archTTHTML+segmentTTHTML+summaryTTHTML+reportLinkTTHTML+"</div>"
+                            return "<div class=\"qa-quality-tt-div\">"+releaseTTHTML+platformTTHTML+hardwareTTHTML+archTTHTML+segmentTTHTML+summaryTTHTML+reportLinkTTHTML+"</div>"
 			},
 			close: function(event, ui) {
 			    ui.tooltip.hover(function () {
@@ -3495,11 +3520,11 @@ function qaSummaryHandler(){
 			}
 		});
 
-                progressValue = parseInt($('.qa-summary-progressbar', qualityElement).attr('id'))
-                if (progressValue < qaThresholdFail){
+                progressValue = parseInt($('.qa-build-progressbar', qualityTag).attr('id'))
+                if (progressValue < qaThresholdWarn){
                     fillColor = { color: "#f37183" }
                     strongColor = "#000000"
-                } else if (progressValue < qaThresholdWarn){
+                } else if (progressValue < qaThresholdPass){
                     fillColor = { color: "#ffc000" }
                     strongColor = "#000000"
                 } else {
@@ -3507,37 +3532,36 @@ function qaSummaryHandler(){
                     strongColor = "#000000"
                 }
 
-                $('.qa-summary-progressbar', qualityElement).circleProgress({
+                $('.qa-build-progressbar', qualityTag).circleProgress({
                     value: progressValue/100,
                     size: 30,
                     thickness: 2,
                     fill: fillColor
                 });
 
-                strongTag = $(qualityElement).find('strong')
-                strongTag.html(parseInt($('.qa-summary-progressbar', qualityElement).attr('id'))+'<i>%</i>');
+                strongTag = $(qualityTag).find('strong')
+                strongTag.html(parseInt($('.qa-build-progressbar', qualityTag).attr('id'))+'<i>%</i>');
                 strongTag.css("color", strongColor)
         }
     });
 }
 
-function updateBuildPanel(panel){
+function updateMSPanel(panel, dbType){
     if (panel.html() != "")
         return
-    componentsJsonPath = reportsJSONPath+"/"+panel.attr("ms")+".components.json"
+    componentsJSONPath = reportsJSONPath+"/"+panel.attr("ms")+"."+dbType+".json"
     $.ajax({
         type: "get",
         dataType: "json",
-        url: componentsJsonPath,
-        success: updateBuildTable
+        url: componentsJSONPath,
+        success: updateMSTable
     }); 
 
-    function updateBuildTable(components){
+    function updateMSTable(components){
         var listPlatformSeg = {};
         $.each(components, function(componentName, componentContent){
             $.each(componentContent, function(platformName, platformContent){
-                blackList = ["issues", "short_desc", "tests"];
-                if ($.inArray(platformName, blackList) >= 0) return true;
+                if ($.inArray(platformName, keyBlackList) >= 0) return true;
                 if (!listPlatformSeg.hasOwnProperty(platformName)) {
                     listPlatformSeg[platformName] = {};
                 }
@@ -3551,16 +3575,17 @@ function updateBuildPanel(panel){
             });
         });
 
-        var tableHeader1 = "<th class=\"qa-full-component-th\" rowspan=\"2\">Components</th><th class=\"qa-full-issue-th\" rowspan=\"2\">Known Issues</th>";
+        dbTitle = dbType.substr(0,1).toUpperCase()+dbType.substr(1)
+        var tableHeader1 = "<th class=\"qa-dashboard-component-th\" rowspan=\"2\">"+dbTitle+"</th><th class=\"qa-dashboard-issue-th\" rowspan=\"2\">Known Issues</th>";
         var tableHeader2 = ""
         $.each(listPlatformSeg, function(platform, platformContent){
             length = 0
             $.each(platformContent, function(segment, segmentContent){
-                if (segment == "short_desc") return true;
-                tableHeader2 += "<td class=\"qa-full-seg-td\">"+segmentContent+"</td>"
+                if ($.inArray(segment, keyBlackList) >= 0) return true;
+                tableHeader2 += "<td class=\"qa-dashboard-seg-td\">"+segmentContent+"</td>"
                 length++
             });
-            tableHeader1 += "<th class=\"qa-full-platform-th\" colspan=\""+length+"\"><span class=\"qa-full-platform-title\">"+platformContent["short_desc"]+"</span></th>"
+            tableHeader1 += "<th class=\"qa-quality-th\" colspan=\""+length+"\"><span class=\"qa-dashboard-platform-title\">"+platformContent["short_desc"]+"</span></th>"
         });
 
         var iComponentHTML = []
@@ -3568,7 +3593,7 @@ function updateBuildPanel(panel){
             var iSeg = ""
             $.each(listPlatformSeg, function(platform, platformContent){
                 $.each(platformContent, function(segment, segmentContent){
-                    if (segment == "short_desc") return true;
+                    if ($.inArray(segment, keyBlackList) >= 0) return true;
                     if (componentContent[platform] && componentContent[platform][segment]){
                         summary = componentContent[platform][segment]
                         buildDesc = reportsJSON[summary["build_path"]]["short_desc"]
@@ -3576,61 +3601,70 @@ function updateBuildPanel(panel){
                         archDesc = reportsJSON[summary["build_path"]][summary["arch_path"]]["short_desc"]
                         totalTestNum = parseInt(summary["block"])+parseInt(summary["fail"])+parseInt(summary["pass"])
                         iSegPassrate = Math.ceil((parseInt(summary["pass"])*100)/totalTestNum)
-                        reportURL = reportsDetailsPath+"/"+summary["build_path"]+"/"+summary["arch_path"]+"/"+platform+"/"+segment+"/components.xml#"+componentContent["short_desc"]
-                        var releaseTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Release:</div>"+buildBranch+"</li>"
-                        var buildDescTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Build:</div>"+buildDesc+"</li>"
-                        var hardwareTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">HW:</div>"+summary["hardware"]+"</li>"
-                        var archTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">ARCH:</div>"+archDesc+"</li>"
-                        var summaryTTHTML = "<li class=\"qa-full-tt-li\"><div class=\"qa-full-tt-span\">Pass Rate:</div>"+iSegPassrate+"% ("+totalTestNum+" executed, "+summary["pass"]+" passed, "+summary["fail"]+" failed, "+summary["block"]+" blocked)</li>"
+                        reportURL = reportsDetailsPath+"/"+summary["build_path"]+"/"+summary["arch_path"]+"/"+platform+"/"+segment+"/"+dbType+".xml#"+componentName
+                        var releaseTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Release:</div>"+buildBranch+"</li>"
+                        var buildDescTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Build:</div>"+buildDesc+"</li>"
+                        var hardwareTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">HW:</div>"+summary["hardware"]+"</li>"
+                        var archTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">ARCH:</div>"+archDesc+"</li>"
+                        var summaryTTHTML = "<li class=\"qa-quality-tt-li\"><div class=\"qa-quality-tt-span\">Pass Rate:</div>"+iSegPassrate+"% ("+totalTestNum+" executed, "+summary["pass"]+" passed, "+summary["fail"]+" failed, "+summary["block"]+" blocked)</li>"
                         var reportLinkTTHTML = "<a href=\""+reportURL.replace(/\ /g,"%20")+"\"><span class=\"a-faux\">See detailed results ....</span></a>"
-                        iSegDetailsHTML = "<span class=\"qa-full-info-span\"><div class=\"qa-full-tt-div\">"+releaseTTHTML+buildDescTTHTML+hardwareTTHTML+archTTHTML+summaryTTHTML+reportLinkTTHTML+"</div></span>"
-                        if (iSegPassrate < qaThresholdFail){
-                            iSegClass = "qa-full-seg-info-red"
-                        } else if (iSegPassrate < qaThresholdWarn){
-                            iSegClass = "qa-full-seg-info-or"
+                        iSegDetailsHTML = "<span class=\"qa-dashboard-info-span\"><div class=\"qa-quality-tt-div\">"+releaseTTHTML+buildDescTTHTML+hardwareTTHTML+archTTHTML+summaryTTHTML+reportLinkTTHTML+"</div></span>"
+                        if (iSegPassrate < qaThresholdWarn){
+                            iSegClass = "qa-quality-seg-info-red"
+                        } else if (iSegPassrate < qaThresholdPass){
+                            iSegClass = "qa-quality-seg-info-or"
                         } else {
-                            iSegClass = "qa-full-seg-info-gr"
+                            iSegClass = "qa-quality-seg-info-gr"
                         }
-                        iSeg += "<td class=\"qa-full-seg-info "+iSegClass+"\">"+iSegPassrate+"%"+iSegDetailsHTML+"</td>"
+                        iSeg += "<td class=\"qa-dashboard-seg-info "+iSegClass+"\">"+iSegPassrate+"%"+iSegDetailsHTML+"</td>"
                     } else {
-                        iSeg += "<td class=\"qa-full-seg-none\"></td>"
+                        iSeg += "<td class=\"qa-quality-seg-none\"></td>"
                     }
                 });
             });
 
             var issuesTipsHTML = ""
-            $.each(componentContent.issues, function(issueName, issueContent){
-                issuesTipsHTML += "<li class=\"qa-full-issue-li\"><a href=\""+issueContent["url"]+"\">"+issueName+"</a></li>"
+            $.each(componentContent.issues, function(issueIndex, issueName){
+                issueURL = ticketsPath+"/"+issueName 
+                issuesTipsHTML += "<li class=\"qa-dashboard-issue-li\"><a href=\""+issueURL+"\">"+issueName+"</a></li>"
             });
 
-            iComponentHTML.push("<tr><td class=\"qa-full-component-info\">"+componentContent["short_desc"]+"</td><td class=\"qa-full-issue-info\">"+issuesTipsHTML+"</td>"+iSeg+"</tr>")
+            if (dbType == "features" && componentContent["short_desc"]) {
+                featureURL = ticketsPath+"/"+componentName
+                iComponentHTML.push("<tr><td class=\"qa-dashboard-component-info\"><a href=\""+featureURL+"\">"+componentName+"</a> -- "+componentContent["short_desc"]+"</td><td class=\"qa-dashboard-issue-info\">"+issuesTipsHTML+"</td>"+iSeg+"</tr>")
+            } else {
+                iComponentHTML.push("<tr><td class=\"qa-dashboard-component-info\">"+componentName+"</td><td class=\"qa-dashboard-issue-info\">"+issuesTipsHTML+"</td>"+iSeg+"</tr>")
+
+            }
         });
 
-        var tableHeader = "<table class=\"qa-full-table\"><tr>"+tableHeader1+"</tr><tr>"+tableHeader2+"</tr></table>";
+        var tableHeader = "<table class=\"qa-dashboard-table\"><tr>"+tableHeader1+"</tr><tr>"+tableHeader2+"</tr></table>";
         panel.html(tableHeader)
-        panel.append("<input type=\"button\" class=\"qa-full-more-button\" value=\"Show more ...\"></input>")
+        if (iComponentHTML.length > tableUpdatedNum) {
+            panel.append("<input type=\"button\" class=\"qa-dashboard-more-button\" value=\"Show more ...\"></input>")
+        }
 
         
         for (var i=0; i<tableUpdatedNum; i++){
             if (i >= iComponentHTML.length)
                 break;
-            $(".qa-full-table", panel).append(iComponentHTML[i])
+            $(".qa-dashboard-table", panel).append(iComponentHTML[i])
         }
 
         function showMore(){
             for (var i=tableUpdatedNum; i<iComponentHTML.length; i++){
                 if (i >= iComponentHTML.length)
                     break;
-                $(".qa-full-table", panel).append(iComponentHTML[i])
+                $(".qa-dashboard-table", panel).append(iComponentHTML[i])
             }
             panel.scrollTop(panel.prop("scrollHeight"))
             $(this).hide() 
         }
 
-        $(".qa-full-more-button", panel).click(showMore)
+        $(".qa-dashboard-more-button", panel).click(showMore)
 
         $("table", panel).tooltip({
-            items: ".qa-full-seg-info",
+            items: ".qa-dashboard-seg-info",
             position: { my: "left-5 bottom+5" , at: "right top"},
             content:function() {
                 summary = $("span", this).html()
@@ -3661,46 +3695,132 @@ function getUrlParameter(sParam)
     }
 }
 
-function qaFullHandler(){
-    $( "quality[test-type='full']" ).each(function() {
-        var buildListHTML = "<div class=\"qa-full-accordion\"></div>";
+function qaDashboardHandler(dbType){
+    $( "quality[test-type='"+dbType+"']" ).each(function() {
+        var buildListHTML = "<div class=\"qa-dashboard-accordion\"></div>";
         $(this).append(buildListHTML)
-        var iQuality = new qualityAttrs($(this));
         var qualityTag = $(this)
         var ms_list = new Array();
-        $.each(reportsJSON, function(buildPath, buildContent){
-            i_ms = buildPath.split(".")[0]
+        $.each(reportsJSON, function(buildName, buildContent){
+            if (dbType == "components" && buildContent["components_active"] == "false") return true;
+            if (dbType == "features" && buildContent["features_active"] == "false") return true;
+            i_ms = buildName.split(".")[0]
             if (ms_list.indexOf(i_ms) < 0) {
                 ms_list.push(i_ms)
             }
         });
 
-        $.each(ms_list, function(n, ms){
-            $(".qa-full-accordion", qualityTag).append("<h id=\""+ms+"\"><li>Crosswalk Project"+ms+"</li></h><div ms=\""+ms+"\"></div>")
+        $.each(ms_list.reverse(), function(n, ms){
+            $(".qa-dashboard-accordion", qualityTag).append("<h id=\""+ms+"\"><li>Crosswalk Project"+ms+"</li></h><div ms=\""+ms+"\"></div>")
 
         });
-        $(".qa-full-accordion", this).accordion({
+        $(".qa-dashboard-accordion", this).accordion({
             active: false,
             heightStyle: "content",
             collapsible: true,
-            beforeActivate: function(event, ui){updateBuildPanel(ui.newPanel)}
+            beforeActivate: function(event, ui){updateMSPanel(ui.newPanel, dbType)}
         });
 
-        activeBuild = getUrlParameter("build")
-        if (activeBuild){
-            var i = 0
-            $(".ui-accordion-header", this).each(function(){
-                if ($(this).attr("id") == activeBuild.split(".")[0])
-                    $(".qa-full-accordion", qualityTag).accordion( "option", "active", i);
-                i = i + 1
+        activeDB = getUrlParameter("dashboard")
+        activeMS = getUrlParameter("milestone")
+        if (activeDB == dbType){
+            if (activeMS){
+                var i = 0
+                $(".ui-accordion-header", this).each(function(){
+                    if ($(this).attr("id") == activeMS)
+                        $(".qa-dashboard-accordion", qualityTag).accordion( "option", "active", i);
+                    i = i + 1
+                });
+            }
+        }
+    });
+}
+
+function qaBuildsHandler(){
+    $( "quality[test-type='builds']" ).each(function() {
+        $(this).append("<div class=\"qa-builddb-div\"></div>")
+        var listTableHeader = {};
+        $.each(reportsJSON, function(buildName, buildContent){
+            $.each(buildContent, function(archName, archContent){
+                if ($.inArray(archName, keyBlackList) >= 0) return true;
+                $.each(archContent, function(platformName, platformContent){ 
+                    if ($.inArray(platformName, keyBlackList) >= 0) return true;
+                    $.each(platformContent, function(segmentName, segmentContent){
+                        if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+                        i_build = {}
+                        i_build[archName] = {}
+                        i_build[archName]["short_desc"] = archContent["short_desc"]
+                        i_build[archName][platformName] = {}
+                        i_build[archName][platformName]["short_desc"] = platformContent["short_desc"]
+                        i_build[archName][platformName][segmentName] = {}
+                        i_build[archName][platformName][segmentName]["short_desc"] = segmentContent["short_desc"]
+                        $.extend(true, listTableHeader, i_build);
+                    });
+                });
             });
+        });
+
+        var tableHeader1 = "<th rowspan=\"3\">Build</th>";
+        var tableHeader2 = ""
+        var tableHeader3 = ""
+        var tableHeader4 = ""
+        $.each(listTableHeader, function(archName, archContent){
+            a_seg_length = 0
+            $.each(archContent, function(platformName, platformContent){
+                if ($.inArray(platformName, keyBlackList) >= 0) return true;
+                p_seg_length = 0
+                $.each(platformContent, function(segmentName, segmentContent){
+                    if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+                    tableHeader3 += "<td class=\"qa-quality-th\">"+segmentContent["short_desc"]+"</td>"
+                    a_seg_length++
+                    p_seg_length++
+                });
+                tableHeader2 += "<td class=\"qa-quality-th\" colspan=\""+p_seg_length+"\">"+platformContent["short_desc"]+"</td>"
+            });
+            tableHeader1 += "<th class=\"qa-quality-th\" colspan=\""+a_seg_length+"\">"+archContent["short_desc"]+"</th>"
+        });
+        var tableHeader = "<table class=\"qa-quality-table\"><tr>"+tableHeader1+"</tr><tr>"+tableHeader2+"</tr><tr>"+tableHeader3+"</tr></table>";
+        var iBuildHTML = []
+        $.each(reportsJSON, function(buildName, buildContent){
+            var iSeg = ""
+            $.each(listTableHeader, function(archName, archContent){
+                $.each(archContent, function(platformName, platformContent){
+                    if ($.inArray(platformName, keyBlackList) >= 0) return true;
+                    $.each(platformContent, function(segmentName, segmentContent){
+                            if ($.inArray(segmentName, keyBlackList) >= 0) return true;
+                            if (buildContent[archName] && buildContent[archName][platformName] && buildContent[archName][platformName][segmentName]){
+                                 iBlockNum = buildContent[archName][platformName][segmentName]["block"]
+                                 iPassNum = buildContent[archName][platformName][segmentName]["pass"]
+                                 iFailNum = buildContent[archName][platformName][segmentName]["fail"]
+                                 totalTestNum = parseInt(iBlockNum)+parseInt(iFailNum)+parseInt(iPassNum)
+                                 iSegPassrate = Math.ceil((parseInt(iPassNum)*100)/totalTestNum)
+                                 if (iSegPassrate < qaThresholdWarn){
+                                     iSegClass = "qa-quality-seg-info-red"
+                                 } else if (iSegPassrate < qaThresholdPass){
+                                     iSegClass = "qa-quality-seg-info-or"
+                                 } else {
+                                     iSegClass = "qa-quality-seg-info-gr"
+                                 }
+                                 reportURL = reportsDetailsPath+"/"+buildName+"/"+archName+"/"+platformName+"/"+segmentName+"/components.xml"
+                                 iSeg += "<td class=\"qa-builddb-seg-info "+iSegClass+"\"><a href=\""+reportURL.replace(/\ /g,"%20")+"\">"+iSegPassrate+"%</a></td>"
+                            } else {
+                                 iSeg += "<td class=\"qa-quality-seg-none\"></td>"
+                            }
+                    });
+                });
+            }); 
+            iBuildHTML.push("<tr><td class=\"qa-builddb-build-info\">"+buildContent["short_desc"]+"</td>"+iSeg+"</tr>")
+        });
+        $(".qa-builddb-div", this).append(tableHeader)
+        for (var i=0; i<iBuildHTML.length; i++){
+            $(".qa-quality-table", this).append(iBuildHTML[i])
         }
 
     });
 }
 
 function qaInit(){
-    if ($("quality")) {
+    if ($( "quality[test-type='feature']") || $( "quality[test-type='build']") || $( "quality[test-type='components']") || $( "quality[test-type='features']") || $( "quality[test-type='builds']")){
         $.ajax({
             type: "get",
             dataType: "json",
@@ -3708,8 +3828,10 @@ function qaInit(){
             success: function(reports){
                 reportsJSON = reports;
                 qaFeatureHandler();
-                qaSummaryHandler();
-                qaFullHandler()
+                qaBuildHandler();
+                qaDashboardHandler("components");
+                qaDashboardHandler("features");
+                qaBuildsHandler();
             }
         });
     }
